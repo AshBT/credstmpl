@@ -73,7 +73,7 @@ def render_template(template, dest):
         # create file with specific permissions
         #   http://stackoverflow.com/questions/5624359/write-file-with-specific-permissions-in-python
         dest_abs_path = os.path.abspath(dest)
-        handle = os.open(dest_abs_path, os.O_WRONLY | os.O_CREAT, 0600)
+        handle = os.open(dest_abs_path, os.O_WRONLY | os.O_CREAT, 0o600)
         with os.fdopen(handle, 'w') as f:
             __log.debug("Writing template to '{}'".format(dest))
             # note that we only provide the `credstash` function
