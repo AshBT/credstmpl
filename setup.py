@@ -20,7 +20,7 @@ setup(
         'credstash>=1.5.2',
         'jinja2>=2.8'
     ],
-    py_modules=['credstmpl'],
+    packages=['credstmpl'],
     entry_points={
         'console_scripts': [
             'credstmpl = credstmpl:main'
