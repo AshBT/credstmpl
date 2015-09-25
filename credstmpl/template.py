@@ -2,7 +2,6 @@ import jinja2
 from jinja2.exceptions import TemplateSyntaxError
 import os
 import logging
-from itertools import izip
 
 from . exceptions import CredsNotFoundException
 from . import creds
