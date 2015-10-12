@@ -3,7 +3,7 @@ from setuptools import setup
 # cribbed from the lovely folks at https://github.com/LuminalOSS/credstash
 setup(
     name='credstmpl',
-    version='0.0.1',
+    version='0.1.0',
     author = 'Eric Chu',
     author_email = 'eric@qadium.com',
     description='A command-line tool to instantiate templates from credstash',
