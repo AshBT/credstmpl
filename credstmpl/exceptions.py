@@ -11,3 +11,6 @@ class CredsNotFoundException(CredsTmplException):
     def __init__(self, message, secret):
         super(CredsNotFoundException, self).__init__(message)
         self.secret = secret
+
+class LastPassNotFoundException(CredsTmplException):
+    pass
