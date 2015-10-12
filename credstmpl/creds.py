@@ -6,7 +6,7 @@ from . exceptions import CredsNotFoundException
 # get the default AWS region
 region = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
 def lookup(secret):
-    """ This closure looks up the secret using credstash. While it is
+    """ This looks up the secret using credstash. While it is
         possible to cache results so that multiple requests for the
         same secret don't hit AWS multiple times, it's probably safer
         not to store the plaintext secrets in memory.
