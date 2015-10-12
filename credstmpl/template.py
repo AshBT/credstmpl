@@ -4,8 +4,9 @@ from jinja2.exceptions import TemplateSyntaxError
 import os
 import logging
 
-from . exceptions import CredsNotFoundException
+from . exceptions import CredsNotFoundException, LastPassNotFoundException
 from . import creds
+from . import lastpass
 
 __log = logging.getLogger(__name__)
 
@@ -73,19 +74,26 @@ def render_template(template, dest):
         # create file with specific permissions
         #   http://stackoverflow.com/questions/5624359/write-file-with-specific-permissions-in-python
         dest_abs_path = os.path.abspath(dest)
-        handle = os.open(dest_abs_path, os.O_WRONLY | os.O_CREAT, 0o600)
-        with os.fdopen(handle, 'w') as f:
+        handle = os.open(dest_abs_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(handle, 'wb') as f:
             __log.debug("Writing template to '{}'".format(dest))
-            # note that we only provide the `credstash` function
-            # in the jinja templates; since each reference to
-            # credstash has to hit the server, this can be slow for
-            # files with lots of credentials
-            f.write(template.render(credstash = creds.lookup))
+            # note that for each reference to any credstash lookup
+            # has to hit AWS, this can be slow for files with lots of
+            # credentials
+            result = template.render(credstash = creds.lookup, lastpass = lastpass.lookup)
+            f.write(result)
     except IOError as e:
         __log.error("Encountered an error writing '{}': {}. Aborting...".format(output, e))
         raise e
     except CredsNotFoundException as e:
-        __log.error("Sorry, but '{}' was not in your credstash. Aborting...".format(e.secret))
+        __log.error(str(e).strip())
+        __log.error("Sorry, but '{}' was not found. Aborting...".format(e.secret))
+        raise e
+    except LastPassNotFoundException as e:
+        __log.error(str(e).strip())
+        __log.error("Sorry, but we could not find the `lpass` binary on your system.")
+        __log.error("If you wish to use Last Pass in your templates, please install the Last Pass CLI. (https://github.com/lastpass/lastpass-cli)")
+        __log.error("Aborting...")
         raise e
 
 def render(filenames):
@@ -102,7 +110,7 @@ def render(filenames):
         try:
             template = create_template(contents)
             render_template(template, contents.dst)
-        except (IOError, CredsNotFoundException, TemplateSyntaxError) as e:
+        except (IOError, CredsNotFoundException, LastPassNotFoundException, TemplateSyntaxError) as e:
             skipped.append(contents.dst)
             continue
         rendered.append(contents.dst)
