@@ -1,6 +1,6 @@
 # credstmpl
 Command-line tool to instantiate templates from credentials stored in
-credstash.
+credstash and Last Pass.
 
 Because your credentials should be treated like a holy temple.
 
@@ -20,6 +20,7 @@ Create a file `foo.sh.j2` (for instance) with the contents
 
 export MY_SECRET={{ credstash('my_secret') }}
 export MY_API_KEY={{ credstash('my_api_key') }}
+export MY_OTHER_SECRET={{ lastpass('my_other_secret', field='password') }}
 ```
 
 Running `credstmpl foo.sh.j2` will write a file `foo.sh` containing your
