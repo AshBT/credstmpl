@@ -1,4 +1,5 @@
 from __future__ import print_function
+from . import hilite
 
 def __set_logging(verbose_count):
     import logging
@@ -15,10 +16,6 @@ def __set_logging(verbose_count):
 
     return log
 
-def __ok(text):
-    # ansi escape sequences for colors, this one uses GREEN
-    return '\033[92m{}\033[0m'.format(text)
-
 def main():
     from . import cli
     from . import template
@@ -28,11 +25,15 @@ def main():
 
     log = __set_logging(args.verbose)
 
-    rendered_templates = template.render(set(args.templates))
+    rendered_templates, skipped_templates = template.render(set(args.templates))
 
     for filename in rendered_templates:
         log.info("Rendered '{}'.".format(filename))
 
+    if skipped_templates:
+        files = "\n\t".join(skipped_templates)
+        print(hilite.bad("Skipped these files due to errors:\n\t{}".format(files)))
+
     if rendered_templates:
         files = "\n\t".join(rendered_templates)
-        print(__ok("Remember to exclude these files from version control:\n\t{}".format(files)))
+        print(hilite.ok("Remember to exclude these files from version control:\n\t{}".format(files)))
