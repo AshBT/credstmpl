@@ -1,3 +1,4 @@
+
 import jinja2
 from jinja2.exceptions import TemplateSyntaxError
 import os
@@ -6,7 +7,7 @@ import logging
 from . exceptions import CredsNotFoundException
 from . import creds
 
-__log = logging.getLogger('credstmpl.template')
+__log = logging.getLogger(__name__)
 
 
 class TemplateContents(object):
@@ -43,7 +44,7 @@ def get_template_contents(filenames):
                 if is_a_template(filename):
                     yield TemplateContents(filename, f.read())
                 else:
-                    __log.error("We expected '{}' to end with a .j2 extension. Skipping...".format(filename))
+                    __log.info("We expected '{}' to end with a .j2 extension. Skipping...".format(filename))
         except IOError:
             __log.info("Could not open file. Skipping '{}'.".format(os.path.abspath(filename)))
 
@@ -92,14 +93,17 @@ def render(filenames):
         filesystem.
 
         :param list filenames:  The list of files to render
-        :return:                A list of rendered templates
+        :return:                A tuple of two lists: the first is a
+                                list of rendered templates, the second a
+                                list of skipped templates.
     """
-    rendered = []
+    rendered, skipped = [], []
     for contents in get_template_contents(filenames):
         try:
             template = create_template(contents)
             render_template(template, contents.dst)
-        except (IOError, CredsNotFoundException, TemplateSyntaxError):
-            break
+        except (IOError, CredsNotFoundException, TemplateSyntaxError) as e:
+            skipped.append(contents.dst)
+            continue
         rendered.append(contents.dst)
-    return rendered
+    return rendered, skipped
