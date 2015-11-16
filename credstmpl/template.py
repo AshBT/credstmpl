@@ -84,6 +84,10 @@ def render_template(template, dest):
             # has to hit AWS, this can be slow for files with lots of
             # credentials
             result = template.render(credstash = creds.lookup, lastpass = lastpass.lookup)
+
+            # File handler needs to be written as bytes
+            # Python 3 returns str
+            # Python 2 returns bytes
             if isinstance(result, str):
                 f.write(result.encode('utf-8'))
             else:

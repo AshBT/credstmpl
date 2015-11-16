@@ -4,9 +4,9 @@ from setuptools import setup
 setup(
     name='credstmpl',
     version='0.1.0',
-    author = 'Eric Chu',
-    author_email = 'eric@qadium.com',
-    description='A command-line tool to instantiate templates from credstash',
+    author = ['Eric Chu', 'Sang Han'],
+    author_email = ['eric@qadium.com', 'sang@qadium.com'],
+    description='A command-line tool to instantiate templates from credstash and lastpass',
     license='Apache v2',
     url='https://github.com/qadium/credstmpl',
     classifiers=[
@@ -20,7 +20,6 @@ setup(
         'credstash>=1.5.2',
         'jinja2>=2.8',
         'jmespath==0.7.1',
-        'six>=1.10.0'
     ],
     packages=['credstmpl'],
     entry_points={
