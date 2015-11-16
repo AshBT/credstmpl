@@ -18,7 +18,9 @@ setup(
         ],
     install_requires=[
         'credstash>=1.5.2',
-        'jinja2>=2.8'
+        'jinja2>=2.8',
+        'jmespath==0.7.1',
+        'six>=1.10.0'
     ],
     packages=['credstmpl'],
     entry_points={

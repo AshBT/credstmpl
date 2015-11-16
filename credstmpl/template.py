@@ -1,10 +1,13 @@
-
-import jinja2
-from jinja2.exceptions import TemplateSyntaxError
+# -*- coding: utf-8 -*-
 import os
 import logging
 
+import jinja2
+
+from jinja2.exceptions import TemplateSyntaxError
+
 from . exceptions import CredsNotFoundException, LastPassNotFoundException
+
 from . import creds
 from . import lastpass
 
@@ -81,7 +84,10 @@ def render_template(template, dest):
             # has to hit AWS, this can be slow for files with lots of
             # credentials
             result = template.render(credstash = creds.lookup, lastpass = lastpass.lookup)
-            f.write(result)
+            if isinstance(result, str):
+                f.write(result.encode('utf-8'))
+            else:
+                f.write(result)
     except IOError as e:
         __log.error("Encountered an error writing '{}': {}. Aborting...".format(output, e))
         raise e
