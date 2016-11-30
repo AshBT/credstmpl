@@ -1,5 +1,7 @@
 from __future__ import print_function
+
 from . import hilite
+
 
 def __set_logging(verbose_count):
     import logging
@@ -16,6 +18,7 @@ def __set_logging(verbose_count):
 
     return log
 
+
 def main():
     from . import cli
     from . import template
@@ -23,9 +26,11 @@ def main():
     parser = cli.creds_tmpl()
     args = parser.parse_args()
 
+    params = dict(tuple(i.split('=')) for i in args.args)
+
     log = __set_logging(args.verbose)
 
-    rendered_templates, skipped_templates = template.render(set(args.templates))
+    rendered_templates, skipped_templates = template.render(set(args.templates), **params)
 
     for filename in rendered_templates:
         log.info("Rendered '{}'.".format(filename))

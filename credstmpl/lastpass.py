@@ -1,6 +1,7 @@
 import subprocess
 
-from . exceptions import CredsNotFoundException, LastPassNotFoundException
+from .exceptions import CredsNotFoundException, LastPassNotFoundException
+
 
 def lookup(secret, field):
     """ This looks up the secret using Last Pass CLI.

@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-import os
 import logging
+import os
 
 import jinja2
-
 from jinja2.exceptions import TemplateSyntaxError
 
-from . exceptions import CredsNotFoundException, LastPassNotFoundException
-
-from . import creds
-from . import lastpass
+from . import creds, lastpass
+from .exceptions import CredsNotFoundException, LastPassNotFoundException
 
 __log = logging.getLogger(__name__)
 
@@ -19,10 +16,11 @@ class TemplateContents(object):
         carries extra metadata along with it, such as the name of the
         source file and its eventual destination.
     """
+
     def __init__(self, filename, contents):
-        self.src            = filename
-        self.data           = contents
-        self.dst, _ext_     = os.path.splitext(filename)
+        self.src = filename
+        self.data = contents
+        self.dst, _ext_ = os.path.splitext(filename)
 
 
 def is_a_template(filename):
@@ -34,6 +32,7 @@ def is_a_template(filename):
     """
     ext = os.path.splitext(filename)[-1]
     return ext == '.j2'
+
 
 def get_template_contents(filenames):
     """ This generator reads valid files and yields their contents.
@@ -52,6 +51,7 @@ def get_template_contents(filenames):
         except IOError:
             __log.info("Could not open file. Skipping '{}'.".format(os.path.abspath(filename)))
 
+
 def create_template(contents):
     """ This function creates a jinja2 template using the given
         string contents.
@@ -66,7 +66,8 @@ def create_template(contents):
         __log.error("Encountered syntax error in '{}' on line {}: {}".format(contents.src, e.lineno, e.message))
         raise e
 
-def render_template(template, dest):
+
+def render_template(template, dest, **kwargs):
     """ This function renders the jinja2 template and writes it to an
         output file that can only be read by the current user.
 
@@ -83,7 +84,7 @@ def render_template(template, dest):
             # note that for each reference to any credstash lookup
             # has to hit AWS, this can be slow for files with lots of
             # credentials
-            result = template.render(credstash = creds.lookup, lastpass = lastpass.lookup)
+            result = template.render(credstash=creds.lookup, lastpass=lastpass.lookup, **kwargs)
 
             # File handler needs to be written as bytes
             # Python 3 returns str
@@ -106,7 +107,8 @@ def render_template(template, dest):
         __log.error("Aborting...")
         raise e
 
-def render(filenames):
+
+def render(filenames, **kwargs):
     """ This function renders the templates and writes them to the
         filesystem.
 
@@ -119,7 +121,7 @@ def render(filenames):
     for contents in get_template_contents(filenames):
         try:
             template = create_template(contents)
-            render_template(template, contents.dst)
+            render_template(template, contents.dst, **kwargs)
         except (IOError, CredsNotFoundException, LastPassNotFoundException, TemplateSyntaxError) as e:
             skipped.append(contents.dst)
             continue
